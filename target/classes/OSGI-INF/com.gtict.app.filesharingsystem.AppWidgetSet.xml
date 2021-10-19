@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="com.gtict.app.filesharingsystem.AppWidgetSet" immediate="true">
+  <implementation class="com.gtict.app.filesharingsystem.AppWidgetSet"/>
+  <service>
+    <provide interface="com.vaadin.osgi.resources.OsgiVaadinWidgetset"/>
+  </service>
+</component>

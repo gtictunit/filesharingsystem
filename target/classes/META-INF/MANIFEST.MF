@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1634672751869
+Bundle-ManifestVersion: 2
+Bundle-Name: filesharingsystem Portlet
+Bundle-SymbolicName: com.gtict.app.filesharingsystem
+Bundle-Version: 0.0.1.202110191945
+Created-By: 13.0.1 (Oracle Corporation)
+Export-Package: com.gtict.app.filesharingsystem;uses:="com.vaadin.osgi
+ .resources,com.vaadin.ui.themes";version="0.0.1"
+Import-Package: com.liferay.portal.kernel.log;version="[7.0,8)",com.va
+ adin.annotations;version="[8.11,9)",com.vaadin.osgi.resources;version
+ ="[8.11,9)",com.vaadin.server;version="[8.11,9)",com.vaadin.ui;versio
+ n="[8.11,9)",com.vaadin.ui.themes;version="[8.11,9)"
+Private-Package: VAADIN.themes.gtictthem,com.gtict.app.ui
+Provide-Capability: osgi.service;objectClass:List<String>="com.vaadin.
+ osgi.resources.OsgiVaadinTheme",osgi.service;objectClass:List<String>
+ ="com.vaadin.osgi.resources.OsgiVaadinWidgetset",osgi.service;objectC
+ lass:List<String>="com.vaadin.ui.UI"
+Require-Capability: osgi.extender;filter:="(&(osgi.extender=osgi.compo
+ nent)(version>=1.3.0)(!(version>=2.0.0)))",osgi.ee;filter:="(&(osgi.e
+ e=JavaSE)(version=1.8))"
+Service-Component: OSGI-INF/com.gtict.app.filesharingsystem.AppTheme.x
+ ml,OSGI-INF/com.gtict.app.filesharingsystem.AppWidgetSet.xml,OSGI-INF
+ /com.gtict.app.ui.UserDashboard.xml
+Tool: Bnd-3.3.0.201609221906

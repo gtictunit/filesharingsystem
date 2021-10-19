@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" name="com.gtict.app.ui.UserDashboard">
+  <implementation class="com.gtict.app.ui.UserDashboard"/>
+  <service scope="prototype">
+    <provide interface="com.vaadin.ui.UI"/>
+  </service>
+  <property name="javax.portlet.security-role-ref" type="String" value="power-user,user"/>
+  <property name="javax.portlet.display-name" type="String" value="File Storage and Sharing App"/>
+  <property name="com.vaadin.osgi.liferay.portlet-ui" type="String" value="true"/>
+  <property name="javax.portlet.name" type="String" value="GTFileSharingApp"/>
+  <property name="com.liferay.portlet.display-category" type="String" value="category.gtict"/>
+</scr:component>
