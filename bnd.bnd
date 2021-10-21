@@ -5,3 +5,15 @@ Export-Package: com.gtict.app.filesharingsystem
 Import-Package: !com.google*,\
     !com.vaadin.client*,\
     *
+
+    
+Bundle-ClassPath:\
+.,\
+META-INF/lib/vaadin-context-menu-3.1.0.jar,\
+META-INF/lib/responsive-layout-2.1.1.jar
+   
+   
+   
+-includeresource:\
+META-INF/lib/vaadin-context-menu-3.1.0.jar=vaadin-context-menu-3.1.0.jar;lib:=true,\
+META-INF/lib/responsive-layout-2.1.1.jar=responsive-layout-2.1.1.jar;lib:=true 	
