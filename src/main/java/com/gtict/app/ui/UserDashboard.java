@@ -19,6 +19,7 @@ import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.contextmenu.ContextMenu;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.WrappedPortletSession;
@@ -27,11 +28,20 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
+import com.vaadin.ui.Upload.FailedEvent;
+import com.vaadin.ui.Upload.FailedListener;
+import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Upload.SucceededEvent;
+import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import com.vaadin.ui.HorizontalLayout;
 
@@ -51,7 +61,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class UserDashboard extends UI {
 
     private static Log log = LogFactoryUtil.getLog(UserDashboard.class);
-    HorizontalLayout layout = new HorizontalLayout();
+    VerticalLayout layout = new VerticalLayout();
     User user;
 
     @Override
@@ -69,8 +79,18 @@ public class UserDashboard extends UI {
 		ResponsiveRow row3 = respLayout.addRow().withMargin(true);
 		row3.setSpacing(true);
 		
+		HorizontalLayout buttonLayout = new HorizontalLayout();
 		
-		layout.addComponent(respLayout);
+		Button newFile =  new Button("Add New File");
+		Button newFolder =  new Button("Create New Folder");
+		TextField searchBar =  new TextField();
+		searchBar.addValueChangeListener(evt -> {
+//			evt.getValue();
+		});
+		
+		buttonLayout.addComponentsAndExpand(newFile, newFolder);		
+		
+		layout.addComponentsAndExpand(buttonLayout,respLayout);
         layout.setSpacing(true);
         setContent(layout);
         
@@ -116,9 +136,47 @@ public class UserDashboard extends UI {
     private HorizontalLayout addFile() {
     	HorizontalLayout hl =  new HorizontalLayout();
     	Upload upload =  new Upload();
-    	
+    	upload.addSucceededListener(receiver);
+    	upload.addFailedListener(receiver);
     	hl.addComponent(upload);
     	return hl;    	
     }
+
+
+    class ImageReceiver implements Receiver, SucceededListener, FailedListener {
+        private static final long serialVersionUID = -1276759102490466761L;
+
+        public File file;
+        
+        public OutputStream receiveUpload(String filename,
+                                          String mimeType) {
+            // Create upload stream
+            FileOutputStream fos = null; // Stream to write to
+            try {
+                // Open the file for writing.
+                file = new File(AppUtils.getProperty("gt.ict.filesystemapp.rootpath")+user.getJobTitle()+"\\" + filename);
+                fos = new FileOutputStream(file);
+            } catch (final java.io.FileNotFoundException e) {
+                new Notification("Could not open file<br/>",
+                                 e.getMessage(),
+                                 Notification.Type.ERROR_MESSAGE)
+                    .show(UI.getCurrent().getPage());
+                return null;
+            }
+            return fos; // Return the output stream to write to
+        }
+
+        public void uploadSucceeded(SucceededEvent event) {
+            // Show the uploaded file in the image viewer
+        	Notification.show("File Uploaded Successfully! ", Type.ASSISTIVE_NOTIFICATION);
+        }
+
+		@Override
+		public void uploadFailed(FailedEvent event) {
+			// TODO Auto-generated method stub
+			Notification.show("File Failed to Upload! Kindly check the file or file path! If issue persists notify the system administrator", Type.ERROR_MESSAGE);
+		}
+    };
+    ImageReceiver receiver = new ImageReceiver(); 
     
 }
