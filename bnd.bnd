@@ -10,10 +10,14 @@ Import-Package: !com.google*,\
 Bundle-ClassPath:\
 .,\
 META-INF/lib/vaadin-context-menu-3.1.0.jar,\
-META-INF/lib/responsive-layout-2.1.1.jar
+META-INF/lib/responsive-layout-2.1.1.jar,\
+META-INF/lib/wcslib-vaadin-widget-multifileupload-4.0.jar,\
+META-INF/lib/commons-io-2.6.jar,\
    
    
    
 -includeresource:\
 META-INF/lib/vaadin-context-menu-3.1.0.jar=vaadin-context-menu-3.1.0.jar;lib:=true,\
-META-INF/lib/responsive-layout-2.1.1.jar=responsive-layout-2.1.1.jar;lib:=true 	
+META-INF/lib/responsive-layout-2.1.1.jar=responsive-layout-2.1.1.jar;lib:=true,\
+META-INF/lib/wcslib-vaadin-widget-multifileupload-4.0.jar=wcslib-vaadin-widget-multifileupload-4.0.jar,\
+META-INF/lib/commons-io-2.6.jar=commons-io-2.6.jar

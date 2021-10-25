@@ -72,3 +72,8 @@
     top: -0.2em;
     left: 0px;
   }
+  
+  .titlename {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

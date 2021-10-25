@@ -1,31 +1,41 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1634814378524
+Bnd-LastModified: 1635120010906
 Bundle-ClassPath: .,META-INF/lib/vaadin-context-menu-3.1.0.jar,META-IN
- F/lib/responsive-layout-2.1.1.jar
+ F/lib/responsive-layout-2.1.1.jar,META-INF/lib/wcslib-vaadin-widget-m
+ ultifileupload-4.0.jar,META-INF/lib/commons-io-2.6.jar
 Bundle-ManifestVersion: 2
 Bundle-Name: filesharingsystem Portlet
 Bundle-SymbolicName: com.gtict.app.filesharingsystem
-Bundle-Version: 0.0.1.202110211106
+Bundle-Version: 0.0.1.202110250000
 Created-By: 1.8.0_281 (Oracle Corporation)
 Export-Package: com.gtict.app.filesharingsystem;uses:="com.vaadin.osgi
  .resources,com.vaadin.ui.themes";version="0.0.1"
-Import-Package: com.liferay.portal.kernel.exception;version="[7.0,8)",
- com.liferay.portal.kernel.log;version="[7.0,8)",com.liferay.portal.ke
- rnel.model;version="[1.0,2)",com.liferay.portal.kernel.util;version="
- [7.0,8)",com.vaadin.annotations;version="[8.11,9)",com.vaadin.data;ve
- rsion="[8.11,9)",com.vaadin.event;version="[8.11,9)",com.vaadin.osgi.
- resources;version="[8.11,9)",com.vaadin.server;version="[8.11,9)",com
- .vaadin.shared;version="[8.11,9)",com.vaadin.shared.communication;ver
- sion="[8.11,9)",com.vaadin.shared.ui;version="[8.11,9)",com.vaadin.sh
- ared.ui.grid;version="[8.11,9)",com.vaadin.ui;version="[8.11,9)",com.
- vaadin.ui.themes;version="[8.11,9)",com.vaadin.util;version="[8.11,9)
- ",com.vaadin.v7.event;version="[8.11,9)",com.vaadin.v7.shared.ui.grid
- ;version="[8.11,9)",com.vaadin.v7.ui;version="[8.11,9)",javax.portlet
- ;version="[2.0,3)",javax.servlet.http;version="[3.0,4)"
+Import-Package: com.liferay.portal.kernel.exception;version="[8.1,9)",
+ com.liferay.portal.kernel.model;version="[3.0,4)",com.liferay.portal.
+ kernel.util;version="[9.13,10)",com.vaadin.annotations;version="[8.11
+ ,9)",com.vaadin.data;version="[8.11,9)",com.vaadin.event;version="[8.
+ 11,9)",com.vaadin.event.dd;version="[8.11,9)",com.vaadin.event.dd.acc
+ eptcriteria;version="[8.11,9)",com.vaadin.osgi.resources;version="[8.
+ 11,9)",com.vaadin.server;version="[8.11,9)",com.vaadin.shared;version
+ ="[8.11,9)",com.vaadin.shared.communication;version="[8.11,9)",com.va
+ adin.shared.ui;version="[8.11,9)",com.vaadin.shared.ui.grid;version="
+ [8.11,9)",com.vaadin.ui;version="[8.11,9)",com.vaadin.ui.renderers;ve
+ rsion="[8.11,9)",com.vaadin.ui.themes;version="[8.11,9)",com.vaadin.u
+ til;version="[8.11,9)",com.vaadin.v7.event;version="[8.11,9)",com.vaa
+ din.v7.shared.ui.grid;version="[8.11,9)",com.vaadin.v7.ui;version="[8
+ .11,9)",javax.portlet;version="[2.0,3)"
 Private-Package: VAADIN.themes.gtictthem,com.gtict.app.ui,com.gtict.ap
  p.utilities,com.vaadin.contextmenu,com.vaadin.contextmenu.client,com.
  vaadin.v7.contextmenu,com.jarektoro.responsivelayout,com.jarektoro.re
- sponsivelayout.Styleable,com.jarektoro.responsivelayout.styles
+ sponsivelayout.Styleable,com.jarektoro.responsivelayout.styles,VAADIN
+ .themes.multifileupload,com.wcs.wcslib.vaadin.widget.multifileupload,
+ com.wcs.wcslib.vaadin.widget.multifileupload.client,com.wcs.wcslib.va
+ adin.widget.multifileupload.component,com.wcs.wcslib.vaadin.widget.mu
+ ltifileupload.receiver,com.wcs.wcslib.vaadin.widget.multifileupload.u
+ i,org.apache.commons.io,org.apache.commons.io.comparator,org.apache.c
+ ommons.io.filefilter,org.apache.commons.io.input,org.apache.commons.i
+ o.monitor,org.apache.commons.io.output,org.apache.commons.io.serializ
+ ation
 Provide-Capability: osgi.service;objectClass:List<String>="com.vaadin.
  osgi.resources.OsgiVaadinTheme",osgi.service;objectClass:List<String>
  ="com.vaadin.osgi.resources.OsgiVaadinWidgetset",osgi.service;objectC
