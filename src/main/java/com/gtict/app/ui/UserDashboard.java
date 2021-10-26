@@ -11,6 +11,8 @@ import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.contextmenu.ContextMenu;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ContentMode;
@@ -30,9 +32,14 @@ import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import java.awt.Desktop;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.vaadin.ui.HorizontalLayout;
 
@@ -52,6 +59,9 @@ public class UserDashboard extends UI {
 //    private static Log log = LogFactoryUtil.getLog(UserDashboard.class);
 	VerticalLayout layout = new VerticalLayout();
 	User user;
+	String searchKey = "";
+	
+	
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -66,79 +76,9 @@ public class UserDashboard extends UI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ResponsiveLayout respLayout = new ResponsiveLayout();
-		ResponsiveRow row3 = respLayout.addRow().withMargin(true);
-		row3.setSpacing(true);
 
-		ResponsiveLayout buttonLayout = new ResponsiveLayout();
-		ResponsiveRow row2 = buttonLayout.addRow().withMargin(true);
-		row2.setSpacing(true);
-
-		Button newFile = new Button("Add New File");
-		newFile.addClickListener(listener -> {
-			Window window = new Window();
-			window.setClosable(true);
-			window.center();
-			window.setWidth("50%");
-			window.setHeight("50%");
-			window.setModal(true);
-			UploadComponent u = new UploadComponent(user.getJobTitle());
-			u.setSizeFull();
-			window.setContent(u);
-			UI.getCurrent().addWindow(window);
-		});
-		Button newFolder = new Button("Create New Folder");
-		TextField searchBar = new TextField();
-		searchBar.setPlaceholder("Search for file/folder");
-		searchBar.addValueChangeListener(evt -> {
-//			evt.getValue();
-		});
-
-		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFile);
-		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFolder);
-		row2.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(searchBar);
-
-		layout.addComponent(buttonLayout);
-		layout.addComponent(respLayout);
-		layout.setSpacing(true);
+		populateDashboard();
 		setContent(layout);
-
-		File folder = new File(AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\");
-		File[] listOfFiles = folder.listFiles();
-		System.out.println("No Of Files:: " + listOfFiles.length);
-		for (File i : listOfFiles) {
-			if (i.isDirectory()) {
-//        	VerticalLayout fl = new VerticalLayout();
-				Label l = new Label("<span><div class=\"folder\"></div></span><br><div class\"titlename\"><b>" + i.getName() + "</b></div>");
-				l.setContentMode(ContentMode.HTML);
-//                	Label lb = new Label(i.getName());        	
-				// Create a context menu for 'someComponent'
-				ContextMenu contextMenu = new ContextMenu(l, true);
-				MenuItem item = contextMenu.addItem("Checkable", e -> {
-					Notification.show("checked: " + e.isChecked());
-				});
-				item.setEnabled(true);
-//                	fl.addComponents(l,lb);
-				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(l);
-			}
-		}
-
-		for (File i : listOfFiles) {
-			if (i.isFile()) {
-//        	VerticalLayout fl = new VerticalLayout();
-				Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">" + i.getName() + "</div>");
-				l.setContentMode(ContentMode.HTML);
-//        	Label lb = new Label(i.getName());        	
-				// Create a context menu for 'someComponent'
-				ContextMenu contextMenu = new ContextMenu(l, true);
-				MenuItem item = contextMenu.addItem("Checkable", e -> {
-					Notification.show("checked: " + e.isChecked());
-				});
-				item.setEnabled(true);
-//        	fl.addComponents(l,lb);
-				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(l);
-			}
-		}
 	}
 
 	@Override
@@ -155,6 +95,12 @@ public class UserDashboard extends UI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		populateDashboard();
+		setContent(layout);
+	}
+
+	void populateDashboard() {
+		layout.removeAllComponents();
 		ResponsiveLayout respLayout = new ResponsiveLayout();
 		ResponsiveRow row3 = respLayout.addRow().withMargin(true);
 		row3.setSpacing(true);
@@ -190,46 +136,220 @@ public class UserDashboard extends UI {
 		layout.addComponent(buttonLayout);
 		layout.addComponent(respLayout);
 		layout.setSpacing(true);
-		setContent(layout);
 
 		File folder = new File(AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\");
 		File[] listOfFiles = folder.listFiles();
 		System.out.println("No Of Files:: " + listOfFiles.length);
+
+		if (!searchKey.isEmpty()) {
+			for (File i : listOfFiles) {
+				if (i.isDirectory()) {
+					HorizontalLayout fl = new HorizontalLayout();
+					Label l = new Label("<span><div class=\"folder\"></div></span><br><div class\"titlename\"><b>"
+							+ i.getName() + "</b></div>");
+					l.setContentMode(ContentMode.HTML);
+					fl.addComponent(l);
+					fl.addLayoutClickListener(evt -> {
+						if (evt.isDoubleClick()) {
+							// ...
+							populateFileViewWindow(i.getName());
+						}
+					});
+//					ContextMenu contextMenu = new ContextMenu(l, true);
+//					MenuItem item = contextMenu.addItem("Checkable", e -> {
+//						Notification.show("checked: " + e.isChecked());
+//					});
+//					item.setEnabled(true);
+					row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
+				}
+			}
+
+			for (File i : listOfFiles) {
+				if (i.isFile()) {
+					HorizontalLayout fl = new HorizontalLayout();
+					Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">"
+							+ i.getName() + "</div>");
+					l.setContentMode(ContentMode.HTML);
+					fl.addComponent(l);
+					fl.addLayoutClickListener(evt -> {
+						if (evt.isDoubleClick()) {
+							// ...
+							populateFileViewWindow(i.getName());
+						}
+					});
+//			ContextMenu contextMenu = new ContextMenu(l, true);
+//			MenuItem item = contextMenu.addItem("Checkable", e -> {
+//				Notification.show("checked: " + e.isChecked());
+//			});
+//			item.setEnabled(true);
+					row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
+				}
+			}
+		} else {
+			for (File i : listOfFiles) {
+				if (i.getName().contains(searchKey)) {
+					if (i.isDirectory()) {
+						HorizontalLayout fl = new HorizontalLayout();
+						Label l = new Label("<span><div class=\"folder\"></div></span><br><div class\"titlename\"><b>"
+								+ i.getName() + "</b></div>");
+						l.setContentMode(ContentMode.HTML);
+						fl.addComponent(l);
+						fl.addLayoutClickListener(evt -> {
+							if (evt.isDoubleClick()) {
+								// ...
+								populateFileViewWindow(i.getName());
+							}
+						});
+//					ContextMenu contextMenu = new ContextMenu(l, true);
+//					MenuItem item = contextMenu.addItem("Checkable", e -> {
+//						Notification.show("checked: " + e.isChecked());
+//					});
+//					item.setEnabled(true);
+						row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
+					}
+				}
+			}
+
+			for (File i : listOfFiles) {
+				if (i.isFile()) {
+					if (i.getName().contains(searchKey)) {
+						HorizontalLayout fl = new HorizontalLayout();
+						Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">"
+								+ i.getName() + "</div>");
+						l.setContentMode(ContentMode.HTML);
+						fl.addComponent(l);
+						fl.addLayoutClickListener(evt -> {
+							if (evt.isDoubleClick()) {
+								// ...
+								viewFile(i);
+							}
+						});
+						row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
+					}
+				}
+			}
+		}
+	}
+
+	void populateFileViewWindow(String folderPath) {
+		layout.removeAllComponents();
+		ResponsiveLayout respLayout = new ResponsiveLayout();
+		ResponsiveRow row3 = respLayout.addRow().withMargin(true);
+		row3.setSpacing(true);
+
+		ResponsiveLayout buttonLayout = new ResponsiveLayout();
+		ResponsiveRow row2 = buttonLayout.addRow().withMargin(true);
+		row2.setSpacing(true);
+
+		Button back = new Button("Dashboard");
+		back.setIcon(FontAwesome.DASHBOARD);
+		back.addClickListener(evx -> {
+			populateDashboard();
+		});
+
+		Button newFile = new Button("Add New File");
+		newFile.addClickListener(listener -> {
+			Window window = new Window();
+			window.setClosable(true);
+			window.center();
+			window.setWidth("50%");
+			window.setHeight("50%");
+			window.setModal(true);
+			UploadComponent u = new UploadComponent(user.getJobTitle() + "\\" + folderPath);
+			u.setSizeFull();
+			window.setContent(u);
+			UI.getCurrent().addWindow(window);
+		});
+		Button newFolder = new Button("Create New Folder");
+		TextField searchBar = new TextField();
+		searchBar.setPlaceholder("Search for file/folder");
+		searchBar.addValueChangeListener(evt -> {
+//			evt.getValue();
+		});
+
+		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(back);
+		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFile);
+		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFolder);
+		row2.addColumn().withDisplayRules(6, 0, 0, 0).withComponent(searchBar);
+
+		layout.addComponent(buttonLayout);
+		layout.addComponent(respLayout);
+		layout.setSpacing(true);
+
+		File folder = new File(
+				AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\" + folderPath + "\\");
+		File[] listOfFiles = folder.listFiles();
+		System.out.println("No Of Files:: " + listOfFiles.length);
+
 		for (File i : listOfFiles) {
 			if (i.isDirectory()) {
-//        	VerticalLayout fl = new VerticalLayout();
-				Label l = new Label("<span><div class=\"folder\"></div></span><br><b>" + i.getName() + "</b>");
+				HorizontalLayout fl = new HorizontalLayout();
+				Label l = new Label("<span><div class=\"folder\"></div></span><br><div class\"titlename\"><b>"
+						+ i.getName() + "</b></div>");
 				l.setContentMode(ContentMode.HTML);
-//                	Label lb = new Label(i.getName());        	
-				// Create a context menu for 'someComponent'
-				ContextMenu contextMenu = new ContextMenu(l, true);
-				MenuItem item = contextMenu.addItem("Checkable", e -> {
-					Notification.show("checked: " + e.isChecked());
+				fl.addComponent(l);
+				fl.addLayoutClickListener(evt -> {
+					if (evt.isDoubleClick()) {
+						// ...
+						populateFileViewWindow(i.getName());
+					}
 				});
-				item.setEnabled(true);
-//                	fl.addComponents(l,lb);
-				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(l);
+//				ContextMenu contextMenu = new ContextMenu(l, true);
+//				MenuItem item = contextMenu.addItem("Checkable", e -> {
+//					Notification.show("checked: " + e.isChecked());
+//				});
+//				item.setEnabled(true);
+				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(fl);
 			}
 		}
 
 		for (File i : listOfFiles) {
 			if (i.isFile()) {
-//        	VerticalLayout fl = new VerticalLayout();
-				Label l = new Label("<span><div class=\"file\"></div></span><br>" + i.getName() + "");
+				HorizontalLayout fl = new HorizontalLayout();
+				Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">" + i.getName()
+						+ "</div>");
 				l.setContentMode(ContentMode.HTML);
-//        	Label lb = new Label(i.getName());        	
-				// Create a context menu for 'someComponent'
-				ContextMenu contextMenu = new ContextMenu(l, true);
-				MenuItem item = contextMenu.addItem("Checkable", e -> {
-					Notification.show("checked: " + e.isChecked());
+				fl.addComponent(l);
+				fl.addLayoutClickListener(evt -> {
+					if (evt.isDoubleClick()) {
+						// ...
+						try {
+							byte[] bytes = Files.readAllBytes(i.toPath());
+							Path tempFile = Files.createTempFile(null, null);
+							Files.write(tempFile, bytes);
+							Desktop.getDesktop().open(tempFile.toFile());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 				});
-				item.setEnabled(true);
-//        	fl.addComponents(l,lb);
-				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(l);
+//		ContextMenu contextMenu = new ContextMenu(l, true);
+//		MenuItem item = contextMenu.addItem("Checkable", e -> {
+//			Notification.show("checked: " + e.isChecked());
+//		});
+//		item.setEnabled(true);
+				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(fl);
 			}
 		}
 	}
 
+	void viewFile(File i) {
+		try {
+			System.setProperty("java.awt.headless", "false");
+			com.liferay.portal.kernel.util.SystemProperties.set("java.awt.headless", "false");
+			boolean headless = GraphicsEnvironment.isHeadless();
+			System.out.println("Headless: " + headless);
+			byte[] bytes = Files.readAllBytes(i.toPath());
+			Path tempFile = Files.createTempFile(null, null);
+			Files.write(tempFile, bytes);
+			Desktop.getDesktop().open(tempFile.toFile());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	class ImageReceiver implements Receiver, SucceededListener, FailedListener {
 		private static final long serialVersionUID = -1276759102490466761L;
 
