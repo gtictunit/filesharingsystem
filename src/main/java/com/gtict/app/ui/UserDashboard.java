@@ -7,6 +7,7 @@ import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
@@ -47,7 +48,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
 @Theme("gtictthem")
-@StyleSheet({ "filefolder.css" })
+@StyleSheet({ "filefolder.css"})
+@JavaScript({ "filefolderactions.js" })
 @SuppressWarnings("serial")
 @Widgetset("com.gtict.app.filesharingsystem.AppWidgetSet")
 @Component(service = UI.class, property = { "com.liferay.portlet.display-category=category.gtict",
@@ -56,12 +58,13 @@ import org.osgi.service.component.annotations.ServiceScope;
 		"com.vaadin.osgi.liferay.portlet-ui=true" }, scope = ServiceScope.PROTOTYPE)
 public class UserDashboard extends UI {
 
+	private static String HOME_CONTEXT = "";
+	private static String CURRENT_CONTEXT = "";
+	private static int CONTEXT_COUNT = 0;
 //    private static Log log = LogFactoryUtil.getLog(UserDashboard.class);
 	VerticalLayout layout = new VerticalLayout();
 	User user;
 	String searchKey = "";
-	
-	
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -70,14 +73,17 @@ public class UserDashboard extends UI {
 		try {
 			user = PortalUtil.getUser(pRequest);
 			System.out.println("User StaffID:: " + user.getJobTitle());
-			System.out.println("Main Folder path::  " + AppUtils.getProperty("gt.ict.filesystemapp.rootpath")
-					+ user.getJobTitle() + "\\");
+			HOME_CONTEXT = AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\";
+			System.out.println("Main Folder path::  " + HOME_CONTEXT);
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		if (CONTEXT_COUNT == 0) {
+			CURRENT_CONTEXT = HOME_CONTEXT;
+		}
 
-		populateDashboard();
+		populateDashboard(HOME_CONTEXT);
 		setContent(layout);
 	}
 
@@ -89,27 +95,35 @@ public class UserDashboard extends UI {
 		try {
 			user = PortalUtil.getUser(pRequest);
 			System.out.println("User StaffID:: " + user.getJobTitle());
-			System.out.println("Main Folder path::  " + AppUtils.getProperty("gt.ict.filesystemapp.rootpath")
-					+ user.getJobTitle() + "\\");
+			HOME_CONTEXT = AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\";
+			System.out.println("Main Folder path::  " + HOME_CONTEXT);
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		populateDashboard();
+		if (CONTEXT_COUNT > 0) {
+			populateFileViewWindow(CURRENT_CONTEXT, "");
+		}
+
+		if (CONTEXT_COUNT == 0) {
+			populateDashboard(HOME_CONTEXT);
+		}
 		setContent(layout);
 	}
 
-	void populateDashboard() {
+	void populateDashboard(String CONTEXT_URI) {
 		layout.removeAllComponents();
 		ResponsiveLayout respLayout = new ResponsiveLayout();
 		ResponsiveRow row3 = respLayout.addRow().withMargin(true);
 		row3.setSpacing(true);
 
 		ResponsiveLayout buttonLayout = new ResponsiveLayout();
+		buttonLayout.setSizeFull();
 		ResponsiveRow row2 = buttonLayout.addRow().withMargin(true);
 		row2.setSpacing(true);
 
-		Button newFile = new Button("Add New File");
+		Button newFile = new Button("File");
+		newFile.setIcon(FontAwesome.PLUS);
 		newFile.addClickListener(listener -> {
 			Window window = new Window();
 			window.setClosable(true);
@@ -117,32 +131,60 @@ public class UserDashboard extends UI {
 			window.setWidth("50%");
 			window.setHeight("50%");
 			window.setModal(true);
-			UploadComponent u = new UploadComponent(user.getJobTitle());
+			UploadComponent u = new UploadComponent(CONTEXT_URI);
 			u.setSizeFull();
 			window.setContent(u);
 			UI.getCurrent().addWindow(window);
 		});
-		Button newFolder = new Button("Create New Folder");
+
+		Button newFolder = new Button("Folder");
+		newFolder.setIcon(FontAwesome.PLUS);
+		newFolder.addClickListener(listener -> {
+			TextField eFolder = new TextField("Enter Folder Name");
+			Button createFolder = new Button("Create");
+			createFolder.addClickListener(evnt -> {
+				File f = new File(CONTEXT_URI + "\\" + eFolder.getValue());
+				f.mkdir();
+			});
+			Window window = new Window();
+			window.setClosable(true);
+			window.center();
+			window.setWidth("50%");
+			window.setHeight("50%");
+			window.setModal(true);
+			VerticalLayout u = new VerticalLayout();
+			u.setSizeFull();
+			u.addComponentsAndExpand(eFolder, createFolder);
+			window.setContent(u);
+			UI.getCurrent().addWindow(window);
+		});
+
 		TextField searchBar = new TextField();
 		searchBar.setPlaceholder("Search for file/folder");
 		searchBar.addValueChangeListener(evt -> {
-//			evt.getValue();
 		});
 
-		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFile);
-		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFolder);
-		row2.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(searchBar);
+		row2.addColumn().withDisplayRules(6, 0, 0, 0).withComponent(newFile);
+		row2.addColumn().withDisplayRules(6, 0, 0, 0).withComponent(newFolder);
+//		row2.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(searchBar);
 
 		layout.addComponent(buttonLayout);
 		layout.addComponent(respLayout);
 		layout.setSpacing(true);
 
-		File folder = new File(AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\");
+		File folder = new File(CONTEXT_URI);
 		File[] listOfFiles = folder.listFiles();
 		System.out.println("No Of Files:: " + listOfFiles.length);
+		
+//		HorizontalLayout flx = new HorizontalLayout();
+//		Label lx = new Label("<span><div class=\"folderx\"></div></span><br><div class\"titlename\"><b>CARDIO</b></div>");
+//		lx.setContentMode(ContentMode.HTML);
+//		flx.addComponent(lx);
+
+//		row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(flx);
 
 		if (!searchKey.isEmpty()) {
-			for (File i : listOfFiles) {
+			for (File i : listOfFiles) {				
 				if (i.isDirectory()) {
 					HorizontalLayout fl = new HorizontalLayout();
 					Label l = new Label("<span><div class=\"folder\"></div></span><br><div class\"titlename\"><b>"
@@ -152,14 +194,11 @@ public class UserDashboard extends UI {
 					fl.addLayoutClickListener(evt -> {
 						if (evt.isDoubleClick()) {
 							// ...
-							populateFileViewWindow(i.getName());
+							CURRENT_CONTEXT = CONTEXT_URI + "\\" + i.getName();
+							CONTEXT_COUNT = CONTEXT_COUNT + 1;
+							populateFileViewWindow(CURRENT_CONTEXT, i.getName());
 						}
 					});
-//					ContextMenu contextMenu = new ContextMenu(l, true);
-//					MenuItem item = contextMenu.addItem("Checkable", e -> {
-//						Notification.show("checked: " + e.isChecked());
-//					});
-//					item.setEnabled(true);
 					row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
 				}
 			}
@@ -174,14 +213,9 @@ public class UserDashboard extends UI {
 					fl.addLayoutClickListener(evt -> {
 						if (evt.isDoubleClick()) {
 							// ...
-							populateFileViewWindow(i.getName());
+							viewFile(new File(i.getName()));
 						}
 					});
-//			ContextMenu contextMenu = new ContextMenu(l, true);
-//			MenuItem item = contextMenu.addItem("Checkable", e -> {
-//				Notification.show("checked: " + e.isChecked());
-//			});
-//			item.setEnabled(true);
 					row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
 				}
 			}
@@ -197,14 +231,11 @@ public class UserDashboard extends UI {
 						fl.addLayoutClickListener(evt -> {
 							if (evt.isDoubleClick()) {
 								// ...
-								populateFileViewWindow(i.getName());
+								CURRENT_CONTEXT = CONTEXT_URI + "\\" + i.getName();
+								CONTEXT_COUNT = CONTEXT_COUNT + 1;
+								populateFileViewWindow(CURRENT_CONTEXT, i.getName());
 							}
 						});
-//					ContextMenu contextMenu = new ContextMenu(l, true);
-//					MenuItem item = contextMenu.addItem("Checkable", e -> {
-//						Notification.show("checked: " + e.isChecked());
-//					});
-//					item.setEnabled(true);
 						row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
 					}
 				}
@@ -231,7 +262,7 @@ public class UserDashboard extends UI {
 		}
 	}
 
-	void populateFileViewWindow(String folderPath) {
+	void populateFileViewWindow(String CTX_URI, String filename) {
 		layout.removeAllComponents();
 		ResponsiveLayout respLayout = new ResponsiveLayout();
 		ResponsiveRow row3 = respLayout.addRow().withMargin(true);
@@ -241,13 +272,31 @@ public class UserDashboard extends UI {
 		ResponsiveRow row2 = buttonLayout.addRow().withMargin(true);
 		row2.setSpacing(true);
 
-		Button back = new Button("Dashboard");
-		back.setIcon(FontAwesome.DASHBOARD);
-		back.addClickListener(evx -> {
-			populateDashboard();
+		ResponsiveRow row4 = buttonLayout.addRow().withMargin(true);
+		row4.setSpacing(true);
+
+		Button home = new Button("HOME");
+		home.setIcon(FontAwesome.HOME);
+		home.addClickListener(evx -> {
+			populateDashboard(HOME_CONTEXT);
 		});
 
-		Button newFile = new Button("Add New File");
+		Button back = new Button("BACK");
+		back.setIcon(FontAwesome.BACKWARD);
+		back.addClickListener(evx -> {
+			CONTEXT_COUNT = CONTEXT_COUNT - 1;
+			if (CONTEXT_COUNT > 0) {
+				CURRENT_CONTEXT = CTX_URI.substring(0, CTX_URI.lastIndexOf("\\"));
+				populateFileViewWindow(CURRENT_CONTEXT, "");
+			}
+
+			if (CONTEXT_COUNT == 0) {
+				populateDashboard(HOME_CONTEXT);
+			}
+		});
+
+		Button newFile = new Button("File");
+		newFile.setIcon(FontAwesome.PLUS);
 		newFile.addClickListener(listener -> {
 			Window window = new Window();
 			window.setClosable(true);
@@ -255,29 +304,51 @@ public class UserDashboard extends UI {
 			window.setWidth("50%");
 			window.setHeight("50%");
 			window.setModal(true);
-			UploadComponent u = new UploadComponent(user.getJobTitle() + "\\" + folderPath);
+			UploadComponent u = new UploadComponent(CTX_URI);
 			u.setSizeFull();
 			window.setContent(u);
 			UI.getCurrent().addWindow(window);
 		});
-		Button newFolder = new Button("Create New Folder");
+		Button newFolder = new Button("Folder");
+		newFolder.setIcon(FontAwesome.PLUS);
+		newFolder.setIcon(FontAwesome.PLUS_SQUARE_O);
+		newFolder.addClickListener(l -> {
+			TextField eFolder = new TextField("Enter Folder Name");
+			Button createFolder = new Button("Create");
+			createFolder.addClickListener(evnt -> {
+				File f = new File(CTX_URI + "\\" + eFolder.getValue());
+				f.mkdir();
+			});
+			Window window = new Window();
+			window.setClosable(true);
+			window.center();
+			window.setWidth("50%");
+			window.setHeight("50%");
+			window.setModal(true);
+			VerticalLayout u = new VerticalLayout();
+			u.setSizeFull();
+			u.addComponentsAndExpand(eFolder, createFolder);
+			window.setContent(u);
+			UI.getCurrent().addWindow(window);
+		});
+
 		TextField searchBar = new TextField();
 		searchBar.setPlaceholder("Search for file/folder");
 		searchBar.addValueChangeListener(evt -> {
-//			evt.getValue();
+
 		});
 
-		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(back);
-		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFile);
-		row2.addColumn().withDisplayRules(2, 0, 0, 0).withComponent(newFolder);
-		row2.addColumn().withDisplayRules(6, 0, 0, 0).withComponent(searchBar);
+		row2.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(back);
+		row2.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(home);
+		row4.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(newFile);
+		row4.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(newFolder);
+//		row4.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(searchBar);
 
 		layout.addComponent(buttonLayout);
 		layout.addComponent(respLayout);
 		layout.setSpacing(true);
 
-		File folder = new File(
-				AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\" + folderPath + "\\");
+		File folder = new File(CTX_URI);
 		File[] listOfFiles = folder.listFiles();
 		System.out.println("No Of Files:: " + listOfFiles.length);
 
@@ -291,14 +362,11 @@ public class UserDashboard extends UI {
 				fl.addLayoutClickListener(evt -> {
 					if (evt.isDoubleClick()) {
 						// ...
-						populateFileViewWindow(i.getName());
+						CURRENT_CONTEXT = CTX_URI + "\\" + i.getName();
+						CONTEXT_COUNT = CONTEXT_COUNT + 1;
+						populateFileViewWindow(CURRENT_CONTEXT, i.getName());
 					}
 				});
-//				ContextMenu contextMenu = new ContextMenu(l, true);
-//				MenuItem item = contextMenu.addItem("Checkable", e -> {
-//					Notification.show("checked: " + e.isChecked());
-//				});
-//				item.setEnabled(true);
 				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(fl);
 			}
 		}
@@ -313,22 +381,9 @@ public class UserDashboard extends UI {
 				fl.addLayoutClickListener(evt -> {
 					if (evt.isDoubleClick()) {
 						// ...
-						try {
-							byte[] bytes = Files.readAllBytes(i.toPath());
-							Path tempFile = Files.createTempFile(null, null);
-							Files.write(tempFile, bytes);
-							Desktop.getDesktop().open(tempFile.toFile());
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						viewFile(i);
 					}
 				});
-//		ContextMenu contextMenu = new ContextMenu(l, true);
-//		MenuItem item = contextMenu.addItem("Checkable", e -> {
-//			Notification.show("checked: " + e.isChecked());
-//		});
-//		item.setEnabled(true);
 				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(fl);
 			}
 		}
@@ -349,7 +404,7 @@ public class UserDashboard extends UI {
 			e.printStackTrace();
 		}
 	}
-	
+
 	class ImageReceiver implements Receiver, SucceededListener, FailedListener {
 		private static final long serialVersionUID = -1276759102490466761L;
 

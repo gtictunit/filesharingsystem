@@ -1,8 +1,6 @@
 # Auto detect text files and perform LF normalization
 # exclude everything
-target/*
+/target/*
 .settings/*
 .project
 .classpath
-
-/target/

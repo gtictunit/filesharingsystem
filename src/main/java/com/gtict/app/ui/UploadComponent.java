@@ -42,7 +42,7 @@ public class UploadComponent extends ResponsiveLayout {
         UploadFinishedHandler uploadFinishedHandler = (InputStream stream, String fileName, String mimeType, long length,
 				int filesLeftInQueue) -> {
 
-			File file = new File(AppUtils.getProperty("gt.ict.filesystemapp.rootpath")+userPath+"\\" +fileName);
+			File file = new File(userPath+"\\" +fileName);
 			try {
 				OutputStream outStream = new FileOutputStream(file);
 				byte[] buffer = new byte[8 * 1024];
