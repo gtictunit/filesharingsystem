@@ -12,6 +12,7 @@ import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.contextmenu.ContextMenu;
+import com.vaadin.event.MouseEvents;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinPortletService;
@@ -48,8 +49,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
 @Theme("gtictthem")
-@StyleSheet({ "filefolder.css"})
-@JavaScript({ "filefolderactions.js" })
+@StyleSheet({ "filefolder.css", "contextMenu.css", "contextMenu.min.css"})
+@JavaScript({ "contextMenu.min.js","contextMenu.js","filefolderactions.js" })
 @SuppressWarnings("serial")
 @Widgetset("com.gtict.app.filesharingsystem.AppWidgetSet")
 @Component(service = UI.class, property = { "com.liferay.portlet.display-category=category.gtict",
@@ -177,13 +178,12 @@ public class UserDashboard extends UI {
 		System.out.println("No Of Files:: " + listOfFiles.length);
 		
 //		HorizontalLayout flx = new HorizontalLayout();
-//		Label lx = new Label("<span><div class=\"folderx\"></div></span><br><div class\"titlename\"><b>CARDIO</b></div>");
+//		Label lx = new Label("<span><div class=\"folder\" id=\"folderx\"></div></span><br><div class\"titlename\"><b>CARDIO</b></div>");
 //		lx.setContentMode(ContentMode.HTML);
 //		flx.addComponent(lx);
-
 //		row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(flx);
 
-		if (!searchKey.isEmpty()) {
+//		if (!searchKey.isEmpty()) {
 			for (File i : listOfFiles) {				
 				if (i.isDirectory()) {
 					HorizontalLayout fl = new HorizontalLayout();
@@ -198,6 +198,9 @@ public class UserDashboard extends UI {
 							CONTEXT_COUNT = CONTEXT_COUNT + 1;
 							populateFileViewWindow(CURRENT_CONTEXT, i.getName());
 						}
+						else if(evt.getButton() == MouseEvents.ClickEvent.BUTTON_RIGHT) {
+							 Notification.show("THIS IS A RIGHT CLICK", Type.ERROR_MESSAGE);
+						 }
 					});
 					row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
 				}
@@ -206,6 +209,7 @@ public class UserDashboard extends UI {
 			for (File i : listOfFiles) {
 				if (i.isFile()) {
 					HorizontalLayout fl = new HorizontalLayout();
+					fl.setId("filex");
 					Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">"
 							+ i.getName() + "</div>");
 					l.setContentMode(ContentMode.HTML);
@@ -215,51 +219,61 @@ public class UserDashboard extends UI {
 							// ...
 							viewFile(new File(i.getName()));
 						}
-					});
+						else if(evt.getButton() == MouseEvents.ClickEvent.BUTTON_RIGHT) {
+							 Notification.show("THIS IS A RIGHT CLICK", Type.ERROR_MESSAGE);
+						 }
+					});					
 					row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
 				}
 			}
-		} else {
-			for (File i : listOfFiles) {
-				if (i.getName().contains(searchKey)) {
-					if (i.isDirectory()) {
-						HorizontalLayout fl = new HorizontalLayout();
-						Label l = new Label("<span><div class=\"folder\"></div></span><br><div class\"titlename\"><b>"
-								+ i.getName() + "</b></div>");
-						l.setContentMode(ContentMode.HTML);
-						fl.addComponent(l);
-						fl.addLayoutClickListener(evt -> {
-							if (evt.isDoubleClick()) {
-								// ...
-								CURRENT_CONTEXT = CONTEXT_URI + "\\" + i.getName();
-								CONTEXT_COUNT = CONTEXT_COUNT + 1;
-								populateFileViewWindow(CURRENT_CONTEXT, i.getName());
-							}
-						});
-						row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
-					}
-				}
-			}
-
-			for (File i : listOfFiles) {
-				if (i.isFile()) {
-					if (i.getName().contains(searchKey)) {
-						HorizontalLayout fl = new HorizontalLayout();
-						Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">"
-								+ i.getName() + "</div>");
-						l.setContentMode(ContentMode.HTML);
-						fl.addComponent(l);
-						fl.addLayoutClickListener(evt -> {
-							if (evt.isDoubleClick()) {
-								// ...
-								viewFile(i);
-							}
-						});
-						row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
-					}
-				}
-			}
-		}
+//		} 
+//		else {
+//			for (File i : listOfFiles) {
+//				if (i.getName().contains(searchKey)) {
+//					if (i.isDirectory()) {
+//						HorizontalLayout fl = new HorizontalLayout();
+//						Label l = new Label("<span><div class=\"folder\"></div></span><br><div class\"titlename\"><b>"
+//								+ i.getName() + "</b></div>");
+//						l.setContentMode(ContentMode.HTML);
+//						fl.addComponent(l);
+//						fl.addLayoutClickListener(evt -> {
+//							if (evt.isDoubleClick()) {
+//								// ...
+//								CURRENT_CONTEXT = CONTEXT_URI + "\\" + i.getName();
+//								CONTEXT_COUNT = CONTEXT_COUNT + 1;
+//								populateFileViewWindow(CURRENT_CONTEXT, i.getName());
+//							}
+//							else if(evt.getButton() == MouseEvents.ClickEvent.BUTTON_RIGHT) {
+//								 Notification.show("THIS IS A RIGHT CLICK", Type.ERROR_MESSAGE);
+//							 }
+//						});
+//						row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
+//					}
+//				}
+//			}
+//
+//			for (File i : listOfFiles) {
+//				if (i.isFile()) {
+//					if (i.getName().contains(searchKey)) {
+//						HorizontalLayout fl = new HorizontalLayout();
+//						Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">"
+//								+ i.getName() + "</div>");
+//						l.setContentMode(ContentMode.HTML);
+//						fl.addComponent(l);
+//						fl.addLayoutClickListener(evt -> {
+//							if (evt.isDoubleClick()) {
+//								// ...
+//								viewFile(i);
+//							}
+//							else if(evt.getButton() == MouseEvents.ClickEvent.BUTTON_RIGHT) {
+//								 Notification.show("THIS IS A RIGHT CLICK", Type.ERROR_MESSAGE);
+//							 }
+//						});
+//						row3.addColumn().withDisplayRules(3, 0, 0, 0).withComponent(fl);
+//					}
+//				}
+//			}
+//		}
 	}
 
 	void populateFileViewWindow(String CTX_URI, String filename) {
@@ -366,6 +380,9 @@ public class UserDashboard extends UI {
 						CONTEXT_COUNT = CONTEXT_COUNT + 1;
 						populateFileViewWindow(CURRENT_CONTEXT, i.getName());
 					}
+					else if(evt.getButton() == MouseEvents.ClickEvent.BUTTON_RIGHT) {
+						 Notification.show("THIS IS A RIGHT CLICK", Type.ERROR_MESSAGE);
+					 }
 				});
 				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(fl);
 			}
@@ -383,6 +400,9 @@ public class UserDashboard extends UI {
 						// ...
 						viewFile(i);
 					}
+					else if(evt.getButton() == MouseEvents.ClickEvent.BUTTON_RIGHT) {
+						 Notification.show("THIS IS A RIGHT CLICK", Type.ERROR_MESSAGE);
+					 }
 				});
 				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(fl);
 			}
@@ -405,7 +425,7 @@ public class UserDashboard extends UI {
 		}
 	}
 
-	class ImageReceiver implements Receiver, SucceededListener, FailedListener {
+	class FileReceiver implements Receiver, SucceededListener, FailedListener {
 		private static final long serialVersionUID = -1276759102490466761L;
 
 		public File file;
@@ -441,6 +461,6 @@ public class UserDashboard extends UI {
 		}
 	};
 
-	ImageReceiver receiver = new ImageReceiver();
+	FileReceiver receiver = new FileReceiver();
 
 }

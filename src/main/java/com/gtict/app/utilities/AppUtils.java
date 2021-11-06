@@ -13,7 +13,7 @@ public class AppUtils {
 	public static String getProperty(String propertyName) {
 		String value = "";
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		File initialFile = new File("C:\\AppPortal\\static\\application.properties");
+		File initialFile = new File("C:\\ICT\\Settings\\FileServerApp\\application.properties");
 		InputStream stream = null;
 		try {
 			stream = new FileInputStream(initialFile);
