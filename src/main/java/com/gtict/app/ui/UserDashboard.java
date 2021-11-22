@@ -1,31 +1,34 @@
 package com.gtict.app.ui;
 
 import javax.portlet.PortletRequest;
+
+import com.gtict.app.services.ArchiveLogService;
+import com.gtict.app.services.FileInfoService;
 import com.gtict.app.utilities.AppUtils;
+import com.gtict.app.utilities.Archive_log;
+import com.gtict.app.utilities.FileInfo;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
-import com.vaadin.contextmenu.ContextMenu;
 import com.vaadin.event.MouseEvents;
-import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinPortletService;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FailedEvent;
 import com.vaadin.ui.Upload.FailedListener;
 import com.vaadin.ui.Upload.Receiver;
@@ -42,6 +45,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
 
 import com.vaadin.ui.HorizontalLayout;
 
@@ -51,7 +55,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Theme("gtictthem")
 @StyleSheet({ "filefolder.css", "contextMenu.css", "contextMenu.min.css"})
 @JavaScript({ "contextMenu.min.js","contextMenu.js","filefolderactions.js" })
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "deprecation" })
 @Widgetset("com.gtict.app.filesharingsystem.AppWidgetSet")
 @Component(service = UI.class, property = { "com.liferay.portlet.display-category=category.gtict",
 		"javax.portlet.name=GTFileSharingApp", "javax.portlet.display-name=File Storage and Sharing App",
@@ -60,12 +64,16 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class UserDashboard extends UI {
 
 	private static String HOME_CONTEXT = "";
+	private static String SHARED_CONTEXT = "";
 	private static String CURRENT_CONTEXT = "";
 	private static int CONTEXT_COUNT = 0;
 //    private static Log log = LogFactoryUtil.getLog(UserDashboard.class);
 	VerticalLayout layout = new VerticalLayout();
+	VerticalLayout shared = new VerticalLayout();
+	TabSheet homeTab = new TabSheet();
 	User user;
 	String searchKey = "";
+	long roleId = 0L;
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -73,8 +81,14 @@ public class UserDashboard extends UI {
 //		HttpSession portletSession = PortalUtil.getHttpServletRequest(pRequest).getSession();
 		try {
 			user = PortalUtil.getUser(pRequest);
-			System.out.println("User StaffID:: " + user.getJobTitle());
+			for(Role role:user.getRoles()){
+				if(role.getName().equalsIgnoreCase("ELDER_USER_ROLE")) {
+					roleId = role.getRoleId();
+				}
+			}
+			System.out.println("User StaffID:: " + user.getFullName()+" :: ROLE_ID :: "+roleId);
 			HOME_CONTEXT = AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\";
+			SHARED_CONTEXT = AppUtils.getProperty("gt.ict.filesystemapp.sharedpath")+ "\\";
 			System.out.println("Main Folder path::  " + HOME_CONTEXT);
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
@@ -85,18 +99,30 @@ public class UserDashboard extends UI {
 		}
 
 		populateDashboard(HOME_CONTEXT);
-		setContent(layout);
+		sharedFilesLayout();
+		
+		homeTab.addTab(layout, "Home", FontAwesome.HOME);
+		homeTab.addTab(shared, "Shared With Me", FontAwesome.SHARE_ALT_SQUARE);
+		
+		setContent(homeTab);
 	}
 
 	@Override
 	protected void refresh(VaadinRequest request) {
 		layout.removeAllComponents();
+		shared.removeAllComponents();
 		PortletRequest pRequest = VaadinPortletService.getCurrentPortletRequest();
 //		HttpSession portletSession = PortalUtil.getHttpServletRequest(pRequest).getSession();
 		try {
 			user = PortalUtil.getUser(pRequest);
-			System.out.println("User StaffID:: " + user.getJobTitle());
+			for(Role role:user.getRoles()){
+				if(role.getName().equalsIgnoreCase("ELDER_USER_ROLE")) {
+					roleId = role.getRoleId();
+				}
+			}
+			System.out.println("User StaffID:: " + user.getJobTitle()+" :: ROLE_ID :: "+roleId);
 			HOME_CONTEXT = AppUtils.getProperty("gt.ict.filesystemapp.rootpath") + user.getJobTitle() + "\\";
+			SHARED_CONTEXT = AppUtils.getProperty("gt.ict.filesystemapp.sharedpath")+ "\\";
 			System.out.println("Main Folder path::  " + HOME_CONTEXT);
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
@@ -109,7 +135,11 @@ public class UserDashboard extends UI {
 		if (CONTEXT_COUNT == 0) {
 			populateDashboard(HOME_CONTEXT);
 		}
-		setContent(layout);
+		sharedFilesLayout();
+		homeTab.addTab(layout, "Home", FontAwesome.HOME);
+		homeTab.addTab(shared, "Shared With Me", FontAwesome.SHARE_ALT_SQUARE);
+		
+		setContent(homeTab);
 	}
 
 	void populateDashboard(String CONTEXT_URI) {
@@ -132,7 +162,7 @@ public class UserDashboard extends UI {
 			window.setWidth("50%");
 			window.setHeight("50%");
 			window.setModal(true);
-			UploadComponent u = new UploadComponent(CONTEXT_URI);
+			UploadInterface u = new UploadInterface(CONTEXT_URI, user.getUserId(), roleId);
 			u.setSizeFull();
 			window.setContent(u);
 			UI.getCurrent().addWindow(window);
@@ -276,6 +306,38 @@ public class UserDashboard extends UI {
 //		}
 	}
 
+	void sharedFilesLayout() {
+		shared.removeAllComponents();
+		ResponsiveLayout respLayout = new ResponsiveLayout();
+		ResponsiveRow row3 = respLayout.addRow().withMargin(true);
+		row3.setSpacing(true);
+		shared.addComponent(respLayout);
+		shared.setSpacing(true);
+		
+		File folder = new File(SHARED_CONTEXT);
+		File[] listOfFiles = folder.listFiles();
+		System.out.println("No Of Files:: " + listOfFiles.length);
+		for (File i : listOfFiles) {
+			if (i.isFile()) {
+				HorizontalLayout fl = new HorizontalLayout();
+				Label l = new Label("<span><div class=\"file\"></div></span><br><div class=\"titlename\">" + i.getName()
+						+ "</div>");
+				l.setContentMode(ContentMode.HTML);
+				fl.addComponent(l);
+				fl.addLayoutClickListener(evt -> {
+					if (evt.isDoubleClick()) {
+						// ...
+						viewFile(i);
+					}
+					else if(evt.getButton() == MouseEvents.ClickEvent.BUTTON_RIGHT) {
+						 Notification.show("THIS IS A RIGHT CLICK", Type.ERROR_MESSAGE);
+					 }
+				});
+				row3.addColumn().withDisplayRules(4, 0, 0, 0).withComponent(fl);
+			}
+		}
+	}
+	
 	void populateFileViewWindow(String CTX_URI, String filename) {
 		layout.removeAllComponents();
 		ResponsiveLayout respLayout = new ResponsiveLayout();
@@ -318,7 +380,7 @@ public class UserDashboard extends UI {
 			window.setWidth("50%");
 			window.setHeight("50%");
 			window.setModal(true);
-			UploadComponent u = new UploadComponent(CTX_URI);
+			UploadInterface u = new UploadInterface(CTX_URI, user.getUserId(), roleId);
 			u.setSizeFull();
 			window.setContent(u);
 			UI.getCurrent().addWindow(window);
@@ -332,6 +394,18 @@ public class UserDashboard extends UI {
 			createFolder.addClickListener(evnt -> {
 				File f = new File(CTX_URI + "\\" + eFolder.getValue());
 				f.mkdir();
+				populateFileViewWindow(CTX_URI, "");
+				Archive_log archive_log = new Archive_log();
+				archive_log.setUserId(user.getUserId());
+				archive_log.setLog_date(new Date());
+				archive_log.setAction_info("CREATED_NEW_FOLDER");
+//				FileInfo fileinfo = new FileInfo();
+//				fileinfo.setFilename(userPath+"\\" +fileName);
+//				fileinfo.setUserId(userId);
+//				fileinfo.setSharedWithUsers(userids);
+//				fileinfo.setPrivate(isPrivate);
+//				FileInfoService.save(fileinfo);
+				ArchiveLogService.save(archive_log);
 			});
 			Window window = new Window();
 			window.setClosable(true);

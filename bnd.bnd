@@ -4,6 +4,12 @@ Bundle-SymbolicName: ${project.groupId}.${project.artifactId}
 Export-Package: com.gtict.app.filesharingsystem
 Import-Package: !com.google*,\
     !com.vaadin.client*,\
+    !com.github.luben*,\
+    !com.mongodb.crypt*,\
+    !io.netty*,\
+    !javax.annotation*,\
+    !jnr*,\
+    !org.xerial*,\
     *
 
     
@@ -13,6 +19,7 @@ META-INF/lib/vaadin-context-menu-3.1.0.jar,\
 META-INF/lib/responsive-layout-2.1.1.jar,\
 META-INF/lib/wcslib-vaadin-widget-multifileupload-4.0.jar,\
 META-INF/lib/commons-io-2.6.jar,\
+META-INF/lib/mongo-java-driver-3.12.10.jar,\
    
    
    
@@ -20,4 +27,5 @@ META-INF/lib/commons-io-2.6.jar,\
 META-INF/lib/vaadin-context-menu-3.1.0.jar=vaadin-context-menu-3.1.0.jar;lib:=true,\
 META-INF/lib/responsive-layout-2.1.1.jar=responsive-layout-2.1.1.jar;lib:=true,\
 META-INF/lib/wcslib-vaadin-widget-multifileupload-4.0.jar=wcslib-vaadin-widget-multifileupload-4.0.jar,\
-META-INF/lib/commons-io-2.6.jar=commons-io-2.6.jar
+META-INF/lib/commons-io-2.6.jar=commons-io-2.6.jar,\
+META-INF/lib/mongo-java-driver-3.12.10.jar=mongo-java-driver-3.12.10.jar
