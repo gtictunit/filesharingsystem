@@ -2,11 +2,127 @@
 /* This only allows us to use the mixins defined in it and does not add any styles by itself. */
 @import "../valo/valo.scss";
 
+
+
 /* This contains all of your theme. */
 /* If somebody wants to extend the theme she will include this mixin. */
 @mixin gtictthem {
   /* Include all the styles from the valo theme */
+
   @include valo;
 
   /* Insert your theme rules here */
+}
+
+.file {
+    background:#eee;
+    background:-moz-linear-gradient(top, #ddd 0, #eee 15%, #fff 40%, #fff 70%, #eee 100%);
+    background:-webkit-linear-gradient(top, #ddd 0, #eee 15%, #fff 40%, #fff 70%, #eee 100%);
+    border:1px solid #ccc;
+    -moz-border-radius:3px 15px 3px 3px;
+    -webkit-border-radius:3px 15px 3px 3px;
+    border-radius:3px 15px 3px 3px;
+    -moz-box-shadow:inset rgba(255,255,255,0.8) 0 1px 1px;
+    -webkit-box-shadow:inset rgba(255,255,255,0.8) 0 1px 1px;
+    box-shadow:inset rgba(255,255,255,0.8) 0 1px 1px;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    position:relative;
+    text-indent:-9999em;
+    margin-bottom: -8px;
+    margin-top: 12px;
+  }
+  .file:before {
+    content: '';
+    position: absolute;
+    right:0;
+    width: 10px;
+    height: 10px;
+    background:#ccc;
+    background:-moz-linear-gradient(45deg, #fff 0,  #eee 50%, #ccc 100%);
+    background:-webkit-linear-gradient(45deg, #fff 0,  #eee 50%, #ccc 100%);
+    box-shadow:rgba(0,0,0,0.05) -1px 1px 1px, inset white 0 0 1px;
+    border-bottom:1px solid #ccc;
+    border-left:1px solid #ccc;
+    -moz-border-radius:0 14px 0 0;
+    -webkit-border-radius:0 14px 0 0;
+    border-radius:0 10px 0 0;
+  }
+
+  .file:after {
+    content:"";
+    display:block;
+    position:absolute;
+    left:0;
+    top:0;
+    width: 40%;
+    margin: 10px 20% 0;
+    background:#ccc;
+    background:-moz-linear-gradient(top, #ccc 0, #ccc 20%, #fff 20%, #fff 40%, #ccc 40%, #ccc 60%, #fff 60%, #fff 80%, #ccc 80%, #ccc 100%);
+    background:-webkit-linear-gradient(top, #ccc 0, #ccc 20%, #fff 20%, #fff 40%, #ccc 40%, #ccc 60%, #fff 60%, #fff 80%, #ccc 80%, #ccc 100%);
+    height: 8px;
+  }
+
+
+  .folder {
+    width: 120px;
+    height: 100px;
+    display: inline-block;
+    margin: auto;
+    position: relative;
+    background-color: #708090;
+    border-radius: 0 3px 3px 3px;
+    /*box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.59);*/
+    margin-bottom: -8px;
+    margin-top: 12px;
+  }
+
+  .folder:before {
+    content: '';
+    width: 50%;
+    height: 0.2em;
+    border-radius: 0 20px 0 0;
+    background-color: #708090;
+    position: absolute;
+    top: -0.2em;
+    left: 0px;
+  }
+  
+  .titlename {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.iconblock{
+	display: inline-block;
+	align-items: center;
+	position: relative;
+}
+
+ .iconhome { 
+	width: 15px;
+	height: 15px;
+	background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iMzAiIGhlaWdodD0iMzAiCnZpZXdCb3g9IjAgMCAzMCAzMCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij4gICAgPHBhdGggZD0iTSAxNSAyIEEgMSAxIDAgMCAwIDE0LjMwMDc4MSAyLjI4NTE1NjIgTCAzLjM5MjU3ODEgMTEuMjA3MDMxIEEgMSAxIDAgMCAwIDMuMzU1NDY4OCAxMS4yMzYzMjggTCAzLjMxODM1OTQgMTEuMjY3NTc4IEwgMy4zMTgzNTk0IDExLjI2OTUzMSBBIDEgMSAwIDAgMCAzIDEyIEEgMSAxIDAgMCAwIDQgMTMgTCA1IDEzIEwgNSAyNCBDIDUgMjUuMTA1IDUuODk1IDI2IDcgMjYgTCAyMyAyNiBDIDI0LjEwNSAyNiAyNSAyNS4xMDUgMjUgMjQgTCAyNSAxMyBMIDI2IDEzIEEgMSAxIDAgMCAwIDI3IDEyIEEgMSAxIDAgMCAwIDI2LjY4MTY0MSAxMS4yNjc1NzggTCAyNi42NjYwMTYgMTEuMjU1ODU5IEEgMSAxIDAgMCAwIDI2LjU5NzY1NiAxMS4xOTkyMTkgTCAyNSA5Ljg5MjU3ODEgTCAyNSA2IEMgMjUgNS40NDggMjQuNTUyIDUgMjQgNSBMIDIzIDUgQyAyMi40NDggNSAyMiA1LjQ0OCAyMiA2IEwgMjIgNy40Mzk0NTMxIEwgMTUuNjc3NzM0IDIuMjY3NTc4MSBBIDEgMSAwIDAgMCAxNSAyIHogTSAxOCAxNSBMIDIyIDE1IEwgMjIgMjMgTCAxOCAyMyBMIDE4IDE1IHoiPjwvcGF0aD48L3N2Zz4=') 50% 50% no-repeat;
+	background-size: 100%; 
+}
+
+ .iconsplus {  	
+	width: 15px;
+	height: 15px;
+	right: 20px;
+	background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iMzAiIGhlaWdodD0iMzAiCnZpZXdCb3g9IjAgMCAzMCAzMCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij4gICAgPHBhdGggZD0iTTE1LDNDOC4zNzMsMywzLDguMzczLDMsMTVjMCw2LjYyNyw1LjM3MywxMiwxMiwxMnMxMi01LjM3MywxMi0xMkMyNyw4LjM3MywyMS42MjcsMywxNSwzeiBNMjEsMTZoLTV2NSBjMCwwLjU1My0wLjQ0OCwxLTEsMXMtMS0wLjQ0Ny0xLTF2LTVIOWMtMC41NTIsMC0xLTAuNDQ3LTEtMXMwLjQ0OC0xLDEtMWg1VjljMC0wLjU1MywwLjQ0OC0xLDEtMXMxLDAuNDQ3LDEsMXY1aDUgYzAuNTUyLDAsMSwwLjQ0NywxLDFTMjEuNTUyLDE2LDIxLDE2eiI+PC9wYXRoPjwvc3ZnPg==') 50% 50% no-repeat; 
+	background-size: 100%; 
+}
+
+ .iconback{
+ 	position: relative;
+	width: 15px;
+	height: 15px;
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAEs0lEQVR4nO2ba4hVVRTHf86MzuiUlaM9dCqmPlhCWVKJpB/ELDCH/GC+SFPCID9kGSiFhUREUNEDKqihJ/gheqE9hDRSYghTrBhMG3wxPbFEZrJxbOz2Ye3D2nvunTv3nHvO3nPp/uBy556791r/ve8+e6+19xmoUqVKlTCMBJYDnwHtwONAQ1BFnmgE7geOArkBry+BmnDSsqUJeAw4jtvoX4DvrM/zQgnMikuB54Ae3Ib/CKwG6oEJ1vUHw8hMn6uBN4A+3IbvARbiDvV51vd3+JWZPtcDbwP9uA3/CmgFRhSo86opcxo414/M9JkJbMVt9FlzbXqRejXAr6b81ow1pk4N8qvuxm14HzIKrirBxkyr3j3ZyEyfemAFcAC34T3AC0BzDFtPo6Pl4nRlZsNq4Dfchv8OPAKcn8Bep7GxKy2BWbIet+GHgDXA6IT2JuOuDqXcMsG4ADiFiP0JWArUlWmzGTc+OAO8CIwr024m3IYKbU3RbgvwDjIHRPb/BJal6CMVbkEFLsjA/jXkL6NvMozigkagGxG2I0M/d+LmC51I5wwLoiUrB8zI0M+FwIeWr25gbob+SmYSGtu/78HfWnRuOA0s8uBzSNrQwMXHsrUE6DU++5FEKiiT0V+lzZPPWcBfxmev+RyU99CYf5Inn7eit98JYIonvwW5EZ2gnvHodwGaZncC53j0ncd2dIb2GbltRDv/JY9+85hrCdno0W8NEofkgH+B+R5957EXzQbHePTbDPxhfB9F0vNE1JYp5CQSuTUiKfLuMu2VSrd5zUdS8BPA1558O9Qiu7s54AjFs8OlQBey/9eSgu86YL/xfRw4LwWbibgXnQvuGqRMHdJ4O+1tAy4p03erZXNDmbYSUw/8bER8T+Fd30XknwLlkOBmE+UdiXUYWwcH8e2FDWijbi/w/U50qN4EfIzbEfuBGxL6fsCyEyxCHItMiIX29qaiAp+yrs9G7+Ec8A8yGuLuMjWhucJrcYWnyZNoY262rkfJUz9w+YA6o5AYwj492gGMj+k7GlGHYqtOkYvQX2KLudYE/G2ufVCk7jTgB7QTDgPXxvBtb9b6yk0K8jIaoS0GXkGFzR6i7hhgs1X+JKVvusyw6i2JrTpFWtBRYL/aKW2GHgE8inRglGeUMrGNRJbWHPBEbNUpsxh3q7sDuCKmjVXonkMPcF0JdY6Z8q/H9JUJ45Bd5FkkD7dXop1wDNknLEa7Kbstob9hyTp0JO2ieGd+Ycrt9KDLK2+hnbC2SLnPTZntPkT5pAEJc6NJcbCT5z2mzKeedHllDjoKBpvkuob4vuKJNmJ7yY8Ux6JLZ6yssJKeyXvevDeQ/yTJVDTOOOhNUQC+RX7lvQOub0IPayb4FuWT6GyyH/dplGhv8pu4BivpFgBtYC3yHCLIyfE08/cncQ1WWgfY93e0HK4x72eRBzNjUWkdYOsdhaS+d5vPHyEhc2KDlYC9W9SHZH6jkfv/2SCKPLMCDYgeQtf+zSFF+SR6pjiHPqt4CrgspChf1FH4nyzuCynKJ8vIb/y7QRV5Zh9u4zuQHOB/wXTcxh8GJgZV5Bn7kfou4MqwcsKwEngYOWuoUqVKlVT4D0pjfHbbAVIsAAAAAElFTkSuQmCC') 50% 50% no-repeat;
+ 	background-size: 100%; 
+ 	}
+
+ .icontext { 
+   padding-left : 15px
 }

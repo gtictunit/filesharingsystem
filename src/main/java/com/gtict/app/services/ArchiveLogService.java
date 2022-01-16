@@ -2,7 +2,7 @@ package com.gtict.app.services;
 
 import com.google.gson.Gson;
 import com.gtict.app.dao.DAO;
-import com.gtict.app.utilities.Archive_log;
+import com.gtict.app.models.Archive_log;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -18,7 +18,7 @@ public class ArchiveLogService {
 		// Save in Mongo.
 		DB db = DAO.getDB("archivedb");
 		entity.setId(DAO.getNextId(db, entity.getClass().getName()));
-		DBCollection coll = db.getCollection("file_info");
+		DBCollection coll = db.getCollection("archive_log");
 		Gson gson = new Gson();
 		BasicDBObject obj = (BasicDBObject) JSON.parse(gson.toJson(entity));
 		coll.insert(obj);
@@ -29,7 +29,7 @@ public class ArchiveLogService {
 		// Find all ChangeLogs
 		List<Archive_log> ChangeLogs = new ArrayList<Archive_log>();
 		DB db = DAO.getDB("archivedb");
-		DBCollection coll = db.getCollection("file_info");
+		DBCollection coll = db.getCollection("archive_log");
 		DBCursor cursor = coll.find();
 		try {
 			while (cursor.hasNext()) {

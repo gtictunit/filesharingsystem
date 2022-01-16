@@ -13,7 +13,7 @@ import com.mongodb.WriteConcern;
 
 public class DAO {
 	
-	public static Mongo m;
+	public static MongoClient m;
 
 	static String mongoHost =  "localhost";//AppUtils.getProperty("spring.data.mongodb.host");
 
@@ -31,7 +31,7 @@ public class DAO {
 			// for local loggin
 //			int mongoP = Integer.parseInt(mongoPort);
 			System.out.println("MongoHost:>>> " + mongoHost);
-			m = new Mongo(mongoHost, mongoPort);
+			m = new MongoClient(mongoHost, mongoPort);
 			m.setWriteConcern(WriteConcern.SAFE);
 		} catch (MongoException e) {
 			e.printStackTrace();
